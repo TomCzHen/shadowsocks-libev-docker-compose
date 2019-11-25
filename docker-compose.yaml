@@ -1,0 +1,35 @@
+version: "3.7"
+services:
+  caddy:
+    build:
+      context: caddy
+      args:
+        plugins:
+    restart: unless-stopped
+    environment:
+      CADDY_DOMAIN: ${CADDY_DOMAIN}
+      CADDY_TLS_EMAIL: ${CADDY_TLS_EMAIL}
+      WS_PATH: ${WS_PATH}
+    links:
+      - shadowsocks:shadowsocks
+    volumes:
+      - type: volume
+        source: caddy_volume
+        target: /root/caddy
+    ports:
+      - target: 80
+        published: 8080
+        protocol: tcp
+        mode: host
+  shadowsocks:
+    build:
+      context: shadowsocks-libev
+    restart: unless-stopped
+    environment:
+      - PASSWORD=${SHADOWSOCKS_KEY}
+      - METHOD=${SHADOWSOCKS_METHOD}
+
+
+
+volumes:
+  caddy_volume:
